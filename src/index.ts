@@ -1,19 +1,24 @@
-import { AxiosRequestConfig } from './types'
+import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from './types'
 import xhr from './xhr'
 import { bulidURL } from './helpers/url'
-import { transfromResquest } from './helpers/data';
+import { transfromResquest, transfromResponse } from './helpers/data';
 import { processHeaders } from './helpers/header';
 
-function axios(config: AxiosRequestConfig) {
+function axios(config: AxiosRequestConfig): AxiosPromise {
   processConfig(config)
-  xhr(config)
+  return xhr(config).then((res) => {
+    return transformResponseData(res)
+  })
+}
+function transformResponseData(res: AxiosResponse): AxiosResponse {
+  res.data = transfromResponse(res.data)
+  return res
 }
 
 function processConfig(config: AxiosRequestConfig): void {
   config.url = transformUrl(config)
   config.headers = transformHeaders(config)
   config.data = transfromResquestData(config)
-
 }
 
 // 格式化URl
